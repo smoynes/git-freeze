@@ -1,0 +1,47 @@
+#!/bin/sh
+
+OPTS_SPEC="\
+freeze -l [-r <remote-name>]
+freeze -t [-r] [<remote-name>] <frozen-name>
+freeze -p [-a] [<remote-name>] [<frozen-name>]
+freeze -f [<remote-name>]
+freeze <branch-name>
+
+Archive refs to freezer.
+--
+h,help    show help
+
+ Global options
+r,remote  operate on remotes
+a,all     operate on all remotes
+
+ Command options
+l,list    list frozen refs
+t,thaw    thaw frozen ref into a branch
+p,push    push frozen ref to remote
+"""
+
+eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt -- "$@" || echo exit $?)"
+
+for arg; do
+    case "$arg" in
+        # Global options
+        -r) REMOTE_OPT=1 ; shift ;;
+        -a) ALL_OPT=1 ; shift ;;
+
+        # Command options
+        -l) LIST_COMMAND=1 ; shift ;;
+        -t) THAW_COMMAND=1 ; shift ;;
+        -p) PUSH_COMMAND=1 ; shift ;;
+
+        --) shift; break ;;
+    esac
+done
+
+if [ $LIST_COMMAND ]; then
+    git update-ref refs/f
+elif [ $THAW_COMMAND ]; then
+    echo thaw
+elif [ $PUSH_COMMAND ]; then
+    echo push
+fi
