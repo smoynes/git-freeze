@@ -40,18 +40,26 @@ for arg; do
 done
 
 if [ $LIST_COMMAND ]; then
-    echo "Frozen branches:"
-    git show-ref | \
-        cut -d' ' -f2 | \
-        sane_grep '^refs/freezer/' | \
-        sed -e 's|^refs/freezer/||'
+    git show-ref --abbrev=8 | \
+        sane_grep ' refs/freezer/' | \
+        LANG=C LC_ALL=C sed -e 's|\([0-9a-f]*\) refs/freezer/\(.*\)|\2 (\1)|'
 elif [ $THAW_COMMAND ]; then
-    echo thaw
+    BRANCH="$1"
+    if [ -z "$BRANCH" ]; then
+        die "Frozen branch name argument required"
+    fi
+
+    FREEZER_REF=$(git show-ref --hash refs/freezer/$BRANCH)
+
+    echo Thawing branch: $BRANCH
+    git update-ref refs/heads/$BRANCH $FREEZER_REF || \
+        die "Error: unable to thaw ref refs/heads/$BRANCH $FREEZER_REF"
+    git update-ref -d refs/freezer/$BRANCH $FREEZER_REF
 elif [ $PUSH_COMMAND ]; then
     echo push
 else
     BRANCH="$1"
-    if [ -z $1 ]; then
+    if [ -z "$BRANCH" ]; then
         die "Branch name argument is required"
     fi
 
