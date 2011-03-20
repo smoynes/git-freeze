@@ -40,9 +40,14 @@ for arg; do
 done
 
 if [ $LIST_COMMAND ]; then
-    git show-ref --abbrev=8 | \
-        sane_grep ' refs/freezer/' | \
-        LANG=C LC_ALL=C sed -e 's|\([0-9a-f]*\) refs/freezer/\(.*\)|\2 (\1)|'
+    if [ -z "$REMOTE_OPT" ]; then
+        git show-ref --abbrev=8 | \
+            sane_grep 'refs/freezer/' | \
+            LANG=C LC_ALL=C sed -e 's|\([0-9a-f]*\) refs/freezer/\(.*\)|\2 (\1)|'
+    else
+        git ls-remote | sane_grep 'refs/freezer/' | \
+            LANG=C LC_ALL=C sed -e 's|\([0-9a-f]\{8\}\).*refs/freezer/\(.*\)|\2 (\1)|'
+    fi
 elif [ $THAW_COMMAND ]; then
     BRANCH="$1"
     if [ -z "$BRANCH" ]; then
