@@ -56,7 +56,19 @@ elif [ $THAW_COMMAND ]; then
         die "Error: unable to thaw ref refs/heads/$BRANCH $FREEZER_REF"
     git update-ref -d refs/freezer/$BRANCH $FREEZER_REF
 elif [ $PUSH_COMMAND ]; then
-    echo push
+    if [ -z "$2" ]; then
+        REMOTE=origin
+        BRANCH=$1
+    else
+        REMOTE=$1
+        BRANCH=$2
+    fi
+
+    if [ -z "$BRANCH" ]; then
+        die "Frozen branch name argument required"
+    fi
+
+    git push "$REMOTE" "refs/freezer/$BRANCH:refs/freezer/$BRANCH"
 else
     BRANCH="$1"
     if [ -z "$BRANCH" ]; then
