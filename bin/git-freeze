@@ -3,7 +3,7 @@
 OPTIONS_SPEC="\
 freeze -l [-r] [<remote-name>]
 freeze -t [-r] [<remote-name>] <frozen-name>
-freeze -p [-a] [<remote-name>] [<frozen-name>]
+freeze -p [-d] [<remote-name>] [<frozen-name>]
 freeze -f [<remote-name>]
 freeze <branch-name>
 
@@ -13,7 +13,7 @@ h,help    show help
 
  Global options
 r,remote  operate on remotes
-a,all     operate on all remotes
+d,delete  delete frozen branch from remotes
 
  Command options
 l,list    list frozen refs
@@ -29,6 +29,7 @@ for arg; do
         # Global options
         -r) REMOTE_OPT=1 ; shift ;;
         -a) ALL_OPT=1 ; shift ;;
+        -d) DELETE_OPT=1; shift ;;
 
         # Command options
         -l) LIST_COMMAND=1 ; shift ;;
@@ -73,7 +74,11 @@ elif [ $PUSH_COMMAND ]; then
         die "Frozen branch name argument required"
     fi
 
-    git push "$REMOTE" "refs/freezer/$BRANCH:refs/freezer/$BRANCH"
+    if [ -z "$DELETE_OPT" ]; then
+        git push "$REMOTE" "refs/freezer/$BRANCH:refs/freezer/$BRANCH"
+    else
+        git push "$REMOTE" ":refs/freezer/$BRANCH"
+    fi
 else
     BRANCH="$1"
     if [ -z "$BRANCH" ]; then
@@ -90,4 +95,3 @@ else
         die "Error: unable to update ref refs/freezer/$BRANCH $BRANCH_REF"
     git branch -D $BRANCH 2>&1 > /dev/null || die "Unable to delete branch $BRANCH"
 fi
-
