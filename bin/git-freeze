@@ -19,6 +19,7 @@ d,delete  delete frozen branch from remotes
 l,list    list frozen refs
 t,thaw    thaw frozen ref into a branch
 p,push    push frozen ref to remote
+f,fetch   fetch frozen ref from remote
 """
 
 SUBDIRECTORY_OK=1
@@ -35,7 +36,7 @@ for arg; do
         -l) LIST_COMMAND=1 ; shift ;;
         -t) THAW_COMMAND=1 ; shift ;;
         -p) PUSH_COMMAND=1 ; shift ;;
-
+        -f) FETCH_COMMAND=1 ; shift ;;
         --) shift; break ;;
     esac
 done
@@ -103,12 +104,19 @@ freeze() {
 
 }
 
+fetch() {
+    REMOTE=${1:-origin}
+    git fetch $REMOTE refs/freezer/\*:refs/freezer/\*
+}
+
 if [ $LIST_COMMAND ]; then
     list
 elif [ $THAW_COMMAND ]; then
     thaw "$1"
 elif [ $PUSH_COMMAND ]; then
     push "$1" "$2"
+elif [ $FETCH_COMMAND ]; then
+    fetch $1
 else
     freeze "$1"
 fi
