@@ -40,7 +40,7 @@ for arg; do
     esac
 done
 
-if [ $LIST_COMMAND ]; then
+list() {
     if [ -z "$REMOTE_OPT" ]; then
         git show-ref --abbrev=8 | \
             sane_grep 'refs/freezer/' | \
@@ -49,7 +49,9 @@ if [ $LIST_COMMAND ]; then
         git ls-remote | sane_grep 'refs/freezer/' | \
             LANG=C LC_ALL=C sed -e 's|\([0-9a-f]\{8\}\).*refs/freezer/\(.*\)|\2 (\1)|'
     fi
-elif [ $THAW_COMMAND ]; then
+}
+
+thaw() {
     BRANCH="$1"
     if [ -z "$BRANCH" ]; then
         die "Frozen branch name argument required"
@@ -61,7 +63,9 @@ elif [ $THAW_COMMAND ]; then
     git update-ref refs/heads/$BRANCH $FREEZER_REF || \
         die "Error: unable to thaw ref refs/heads/$BRANCH $FREEZER_REF"
     git update-ref -d refs/freezer/$BRANCH $FREEZER_REF
-elif [ $PUSH_COMMAND ]; then
+}
+
+push() {
     if [ -z "$2" ]; then
         REMOTE=origin
         BRANCH=$1
@@ -79,7 +83,9 @@ elif [ $PUSH_COMMAND ]; then
     else
         git push "$REMOTE" ":refs/freezer/$BRANCH"
     fi
-else
+}
+
+freeze() {
     BRANCH="$1"
     if [ -z "$BRANCH" ]; then
         die "Branch name argument is required"
@@ -94,4 +100,15 @@ else
     git update-ref refs/freezer/$BRANCH $BRANCH_REF || \
         die "Error: unable to update ref refs/freezer/$BRANCH $BRANCH_REF"
     git branch -D $BRANCH 2>&1 > /dev/null || die "Unable to delete branch $BRANCH"
+
+}
+
+if [ $LIST_COMMAND ]; then
+    list
+elif [ $THAW_COMMAND ]; then
+    thaw "$1"
+elif [ $PUSH_COMMAND ]; then
+    push "$1" "$2"
+else
+    freeze "$1"
 fi
