@@ -58,10 +58,10 @@ To fetch a frozen branch from a remote:
 
 To fetch all frozen branches from ``origin``:
 
-     $ git freeze --fetch
-     From REMOTE_URL
-      * [new branch]      refs/freezer/FROZEN_BRANCH -> refs/freezer/FROZEN_BRANCH
-      * [new branch]      refs/freezer/ANOTHER_FROZEN_BRANCH -> refs/freezer/ANOTHER_FROZEN_BRANCH
+    $ git freeze --fetch
+    From REMOTE_URL
+     * [new branch]      refs/freezer/FROZEN_BRANCH -> refs/freezer/FROZEN_BRANCH
+     * [new branch]      refs/freezer/ANOTHER_FROZEN_BRANCH -> refs/freezer/ANOTHER_FROZEN_BRANCH
 
 To delete a frozen branch from a remote:
 
