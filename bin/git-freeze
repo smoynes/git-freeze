@@ -23,13 +23,13 @@
 
 OPTIONS_SPEC="\
 git freeze -l [-r] [<remote-name>]
-git freeze -t [-r] [<remote-name>] <frozen-name>
-git freeze -p [-d] [<remote-name>] [<frozen-name>]
+git freeze -t <frozen-name>
+git freeze -p [-d] [<remote-name>] <frozen-name>
 git freeze -f [<remote-name>] <branch-name>
 
 Archive refs to freezer.
 --
-h,help    show help
+h         show help
 
  Global options
 r,remote  operate on remotes
