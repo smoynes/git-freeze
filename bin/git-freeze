@@ -125,8 +125,17 @@ freeze() {
 }
 
 fetch() {
-    REMOTE=${1:-origin}
-    git fetch $REMOTE refs/freezer/\*:refs/freezer/\*
+    if [ -z "$2" ]; then
+        REMOTE=origin
+        BRANCH=$1
+    else
+        REMOTE=$1
+        BRANCH=$2
+    fi
+    : ${BRANCH:="*"} ${REMOTE:=origin}
+
+    echo Fetching frozen branches
+    git fetch $REMOTE "refs/freezer/${BRANCH}:refs/freezer/${BRANCH}"
 }
 
 if [ $LIST_COMMAND ]; then
@@ -136,7 +145,7 @@ elif [ $THAW_COMMAND ]; then
 elif [ $PUSH_COMMAND ]; then
     push "$1" "$2"
 elif [ $FETCH_COMMAND ]; then
-    fetch $1
+    fetch "$1" "$2"
 else
     freeze "$1"
 fi
